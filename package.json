@@ -1,0 +1,24 @@
+{
+  "_comment": "FILE DETAILS: Independent package configuration for the Portfolio Studio Editor. It manages localized metadata, app startup scripts, and essential dependencies including Express for server hosting, EJS for rendering the dashboard UI, Mongoose for full database CRUD privileges, and Dotenv for sharing the Coolify connection environment securely.",
+  "name": "portfolio-editor",
+  "version": "1.0.0",
+  "description": "Studio editor system for spdwivedi.me portfolio management",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "studio",
+    "editor",
+    "cms"
+  ],
+  "author": "Surya Prakash Dwivedi",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "ejs": "^4.0.1",
+    "express": "^5.2.1",
+    "mongoose": "^8.10.0"
+  }
+}

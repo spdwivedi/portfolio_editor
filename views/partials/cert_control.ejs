@@ -1,0 +1,19 @@
+<div id="certSpaceWorkspaceBlock" class="hidden-space-node">
+    <section style="background: var(--bg-surface); padding: 25px; border-radius: 16px; border: 1px solid rgba(234, 179, 8, 0.15);">
+        <div class="section-header"><h2 class="certs-title"><i class="fa-solid fa-award"></i> Verified Academic Credentials (<span id="activeCertCount"><%= certificates.length %></span>)</h2></div>
+        <div class="manager-list" id="activeCertsWrapper">
+            <% certificates.forEach(cert => { %>
+                <div class="manager-card active-cert-row" id="cert-card-<%= cert._id %>" data-title="<%= cert.title.toLowerCase() %>" data-platform="<%= cert.platform %>" data-json="<%= JSON.stringify(cert) %>">
+                    <div class="card-details">
+                        <h3><%= cert.title %></h3>
+                        <div class="card-meta"><span class="meta-tag cert-tag"><%= cert.platform %></span><span>Timeline Year: <strong><%= cert.year %></strong></span></div>
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn-action" onclick="initializeCertEditContext('<%= cert._id %>')"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button class="btn-action btn-delete" onclick="permanentlyWipeCertificateNode('<%= cert._id %>')"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+    </section>
+</div>

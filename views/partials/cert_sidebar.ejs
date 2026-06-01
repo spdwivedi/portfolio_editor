@@ -1,0 +1,24 @@
+<div id="certSidebarBlock" class="hidden-space-node cert-panel-accent">
+    <div class="panel-title cert-panel-accent">
+        <span id="certFormActionTitle">Register Certificate Node</span>
+        <span class="cancel-edit-btn" id="cancelCertEditBtn" onclick="resetFormToCreateMode()"><i class="fa-solid fa-xmark"></i> Cancel</span>
+    </div>
+    <form id="certForm">
+        <input type="hidden" id="certId" name="certId" value="">
+        <div class="form-group"><label for="certTitle">Course Qualification Title</label><input type="text" id="certTitle" name="title" class="form-control" placeholder="e.g., Deep Learning Specialization" required></div>
+        <div class="form-group">
+            <label for="certPlatform">Issuing Institution</label>
+            <select id="certPlatform" name="platform" class="form-control" required>
+                <option value="Udemy">Udemy</option><option value="Coursera">Coursera</option><option value="NPTEL">NPTEL</option><option value="IBM">IBM Track</option><option value="Other">Other Academic Track</option>
+            </select>
+        </div>
+        <div class="form-group"><label for="certYear">Completion Calendar Year</label><input type="number" id="certYear" name="year" class="form-control" value="2026" required></div>
+        <div class="form-group"><label for="certVerifyUrl">Verification Hyperlink Target</label><input type="url" id="certVerifyUrl" name="verifyUrl" class="form-control" placeholder="https://..." required></div>
+        <button type="submit" class="btn-submit cert-submit-btn" id="submitCertBtn">Register Certificate Node</button>
+    </form>
+    <span class="batch-toggle" onclick="toggleBatchViewDisplay('CERT')">⚙️ Open Bulk Import Matrix</span>
+    <div class="batch-area" id="certBatchWrapper">
+        <div class="form-group"><label>Paste Raw JSON Entry Array</label><textarea id="certBatchInput" class="form-control" rows="4" style="font-family: var(--font-mono); font-size: 0.8rem;" placeholder='[{"title": "Deep Learning", "platform": "Coursera"}]'></textarea></div>
+        <button class="btn-submit cert-submit-btn" onclick="executeBatchDataIngestion('CERT')" style="padding: 6px; font-size: 0.8rem; margin: 0;">Execute Bulk Stream</button>
+    </div>
+</div>

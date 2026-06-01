@@ -1,0 +1,111 @@
+<section class="vfx-registry-panel" id="globalVfxTelemetryRegistryControlBoard">
+    <div class="section-header" style="margin-bottom: 0;">
+        <h2><i class="fa-solid fa-sliders" style="color: var(--accent-secondary);"></i> Live Visual FX Telemetry Registry Control Board</h2>
+        <button class="btn-submit" id="saveGlobalTuningBtn" style="margin: 0; width: auto; padding: 6px 20px; font-size: 0.8rem;" onclick="commitGlobalMatrixToggles()">Commit Matrix Settings</button>
+    </div>
+    
+    <form id="vfxTuningForm">
+        <div class="registry-grid-tracker">
+            <div class="config-card-node">
+                <div class="cyber-switch-container">
+                    <div class="switch-label-stack"><span>Master VFX Engine</span><small>vfxEngineActive</small></div>
+                    <input type="checkbox" id="vfxEngineActive" class="cyber-toggle-input" <%= settings.vfxEngineActive ? 'checked' : '' %>>
+                    <label for="vfxEngineActive" class="cyber-toggle-label"></label>
+                </div>
+                <div class="form-group" style="margin: 0;">
+                    <label style="font-size: 0.68rem;">Operational Sequence Mode</label>
+                    <select id="systemExecutionMode" class="form-control" style="padding: 6px 10px; font-size: 0.8rem;">
+                        <option value="ambient" <%= settings.systemExecutionMode === 'ambient' ? 'selected' : '' %>>Ambient Intervals (Standard)</option>
+                        <option value="serial-test" <%= settings.systemExecutionMode === 'serial-test' ? 'selected' : '' %>>Serial Monitoring (Continuous Loop)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="config-card-node">
+                <div class="cyber-switch-container" style="border-bottom: 1px dashed rgba(255,255,255,0.05); padding-bottom: 4px;">
+                    <div class="switch-label-stack"><span>Autonomic Schedulers</span><small>Interval Minutes</small></div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.75rem; font-family: var(--font-mono);">
+                    <div><label style="color: var(--text-muted); font-size: 0.65rem;">IRON MAN</label><input type="number" id="ironManIntervalMinutes" class="form-control" style="padding: 4px 8px; font-size: 0.8rem;" step="0.5" value="<%= settings.ironManIntervalMinutes %>"></div>
+                    <div><label style="color: var(--text-muted); font-size: 0.65rem;">THOR STRIKE</label><input type="number" id="thorIntervalMinutes" class="form-control" style="padding: 4px 8px; font-size: 0.8rem;" step="0.5" value="<%= settings.thorIntervalMinutes %>"></div>
+                    <div><label style="color: var(--text-muted); font-size: 0.65rem;">JETS SQUAD</label><input type="number" id="jetIntervalMinutes" class="form-control" style="padding: 4px 8px; font-size: 0.8rem;" step="0.5" value="<%= settings.jetIntervalMinutes %>"></div>
+                    <div><label style="color: var(--text-muted); font-size: 0.65rem;">STARS STREAM</label><input type="number" id="starIntervalMinutes" class="form-control" style="padding: 4px 8px; font-size: 0.8rem;" step="0.1" value="<%= settings.starIntervalMinutes %>"></div>
+                </div>
+            </div>
+
+            <div class="config-card-node">
+                <div class="cyber-switch-container" style="margin-bottom: -4px;"><div class="switch-label-stack"><small>Jet Deployment Multiplier</small></div><span id="jetSpawnCountVal" style="font-size: 0.75rem; font-family: var(--font-mono); color: var(--accent-primary);"><%= settings.jetSpawnCount %> units</span></div>
+                <input type="range" id="jetSpawnCount" class="cyber-range-slider" min="1" max="5" step="1" value="<%= settings.jetSpawnCount %>" oninput="document.getElementById('jetSpawnCountVal').innerText=this.value+' units'">
+                <div class="cyber-switch-container" style="margin-bottom: -4px;"><div class="switch-label-stack"><small>Cosmic Star Drifters Density</small></div><span id="starSpawnCountVal" style="font-size: 0.75rem; font-family: var(--font-mono); color: var(--accent-primary);"><%= settings.starSpawnCount %> units</span></div>
+                <input type="range" id="starSpawnCount" class="cyber-range-slider" min="1" max="10" step="1" value="<%= settings.starSpawnCount %>" oninput="document.getElementById('starSpawnCountVal').innerText=this.value+' units'">
+            </div>
+
+            <div class="config-card-node">
+                <div class="cyber-switch-container" style="margin-bottom: -4px;"><div class="switch-label-stack"><small>Firecracker Particles Volume</small></div><span id="fwDensityVal" style="font-size: 0.75rem; font-family: var(--font-mono); color: var(--accent-warning);"><%= settings.fireworksParticleDensity %> count</span></div>
+                <input type="range" id="fireworksParticleDensity" class="cyber-range-slider" min="20" max="200" step="5" value="<%= settings.fireworksParticleDensity %>" oninput="document.getElementById('fwDensityVal').innerText=this.value+' count'">
+                <div class="cyber-switch-container" style="margin-bottom: -4px;"><div class="switch-label-stack"><small>Click Verification Burst Odds</small></div><span id="fwOddsVal" style="font-size: 0.75rem; font-family: var(--font-mono); color: var(--accent-warning);"><%= Math.round(settings.fireworksClickProbability * 100) %>%</span></div>
+                <input type="range" id="fireworksClickProbability" class="cyber-range-slider" min="0" max="1" step="0.01" value="<%= settings.fireworksClickProbability %>" oninput="document.getElementById('fwOddsVal').innerText=Math.round(this.value*100)+'%'">
+            </div>
+
+            <div class="config-card-node" style="justify-content: center;">
+                <div class="cyber-switch-container" style="margin-bottom: -2px;"><div class="switch-label-stack"><small>Ironman Flight Timeline Duration</small></div><span id="ironDurationVal" style="font-size: 0.75rem; font-family: var(--font-mono); color: var(--accent-secondary);"><%= settings.ironManFlightDuration %>s</span></div>
+                <input type="range" id="ironManFlightDuration" class="cyber-range-slider" min="0.5" max="15.0" step="0.1" value="<%= settings.ironManFlightDuration %>" oninput="document.getElementById('ironDurationVal').innerText=this.value+'s'">
+                <div class="cyber-switch-container" style="margin-bottom: -2px;"><div class="switch-label-stack"><small>Thor Shock Extraction Duration</small></div><span id="thorDurationVal" style="font-size: 0.75rem; font-family: var(--font-mono); color: var(--accent-secondary);"><%= settings.thorStrikeDuration %>s</span></div>
+                <input type="range" id="thorStrikeDuration" class="cyber-range-slider" min="0.4" max="10.0" step="0.1" value="<%= settings.thorStrikeDuration %>" oninput="document.getElementById('thorDurationVal').innerText=this.value+'s'">
+                <div class="cyber-switch-container" style="margin-bottom: -2px;"><div class="switch-label-stack"><small>Sci-Fi Fighter Jet Flyby Speed</small></div><span id="jetDurationVal" style="font-size: 0.75rem; font-family: var(--font-mono); color: var(--accent-secondary);"><%= settings.jetFlightDuration || 4.2 %>s</span></div>
+                <input type="range" id="jetFlightDuration" class="cyber-range-slider" min="0.5" max="15.0" step="0.1" value="<%= settings.jetFlightDuration || 4.2 %>" oninput="document.getElementById('jetDurationVal').innerText=this.value+'s'">
+                <div class="cyber-switch-container" style="margin-bottom: -2px;"><div class="switch-label-stack"><small>Shooting Star Transversal Speed</small></div><span id="starDurationVal" style="font-size: 0.75rem; font-family: var(--font-mono); color: var(--accent-secondary);"><%= settings.shootingStarDuration %>s</span></div>
+                <input type="range" id="shootingStarDuration" class="cyber-range-slider" min="0.2" max="6.0" step="0.1" value="<%= settings.shootingStarDuration %>" oninput="document.getElementById('starDurationVal').innerText=this.value+'s'">
+            </div>
+        </div>
+
+        <div class="scifi-subtabs-bar">
+            <button type="button" class="subtab-trigger active" onclick="switchScopeMatrixTab(event, 'pane-home')">Home View</button>
+            <button type="button" class="subtab-trigger" onclick="switchScopeMatrixTab(event, 'pane-projects')">Work Grid</button>
+            <button type="button" class="subtab-trigger" onclick="switchScopeMatrixTab(event, 'pane-certs')">Certs View</button>
+            <button type="button" class="subtab-trigger" onclick="switchScopeMatrixTab(event, 'pane-about')">About Track</button>
+            <button type="button" class="subtab-trigger" onclick="switchScopeMatrixTab(event, 'pane-contact')">Contact Panel</button>
+        </div>
+
+        <div id="pane-home" class="page-scope-pane active">
+            <div class="matrix-checkbox-card"><label><small>Mario Platform</small></label><input type="checkbox" id="home_mario" <%= settings.pageScopes.home.marioEnabled ? 'checked' : '' %>></div>
+            <div class="matrix-checkbox-card"><label><small>Ironman Fly</small></label><input type="checkbox" id="home_ironman" <%= settings.pageScopes.home.ironManEnabled ? 'checked' : '' %>></div>
+            <div class="matrix-checkbox-card"><label><small>Thor Strike</small></label><input type="checkbox" id="home_thor" <%= settings.pageScopes.home.thorEnabled ? 'checked' : '' %>></div>
+            <div class="matrix-checkbox-card"><label><small>Jet Flybys</small></label><input type="checkbox" id="home_jets" <%= settings.pageScopes.home.jetsEnabled ? 'checked' : '' %>></div>
+            <div class="matrix-checkbox-card"><label><small>Shooting Stars</small></label><input type="checkbox" id="home_stars" <%= settings.pageScopes.home.starsEnabled ? 'checked' : '' %>></div>
+            <div class="matrix-checkbox-card"><label><small>Click Fireworks</small></label><input type="checkbox" id="home_fireworks" <%= settings.pageScopes.home.fireworksEnabled ? 'checked' : '' %>></div>
+        </div>
+        <div id="pane-projects" class="page-scope-pane">
+            <div class="matrix-checkbox-card"><label><small>Mario Platform</small></label><input type="checkbox" id="projects_mario" <%= settings.pageScopes.projects.marioEnabled ? 'checked' : '' %>></div>
+            <div class="matrix-checkbox-card"><label><small>Ironman Fly</small></label><input type="checkbox" id="projects_ironman" <%= settings.pageScopes.projects.ironManEnabled ? 'checked' : '' %>></div>
+            <div class="matrix-checkbox-card"><label><small>Thor Strike</small></label><input type="checkbox" id="projects_thor" <%= settings.pageScopes.projects.thorEnabled ? 'checked' : '' %>></div>
+            <div class="matrix-checkbox-card"><label><small>Jet Flybys</small></label><input type="checkbox" id="projects_jets" <%= settings.pageScopes.projects.jetsEnabled ? 'checked' : '' %>></div>
+            <div class="matrix-checkbox-card"><label><small>Shooting Stars</small></label><input type="checkbox" id="projects_stars" <%= settings.pageScopes.projects.starsEnabled ? 'checked' : '' %>></div>
+            <div class="matrix-checkbox-card"><label><small>Click Fireworks</small></label><input type="checkbox" id="projects_fireworks" <%= settings.pageScopes.projects.fireworksEnabled ? 'checked' : '' %>></div>
+        </div>
+        <div id="pane-certs" class="page-scope-pane">
+            <div class="matrix-checkbox-card"><label><small>Mario Platform</small></label><input type="checkbox" id="certs_mario" <%= settings.pageScopes.certifications.marioEnabled ? 'checked' : '' %>></div>
+            <div class="matrix-checkbox-card"><label><small>Ironman Fly</small></label><input type="checkbox" id="certs_ironman" <%= settings.pageScopes.certifications.ironManEnabled ? 'checked' : '' %>></div>
+            <div class="matrix-checkbox-card"><label><small>Thor Strike</small></label><input type="checkbox" id="certs_thor" <%= settings.pageScopes.certifications.thorEnabled ? 'checked' : '' %>></div>
+            <div class="matrix-checkbox-card"><label><small>Jet Flybys</small></label><input type="checkbox" id="certs_jets" <%= settings.pageScopes.certifications.jetsEnabled ? 'checked' : '' %>></div>
+            <div class="matrix-checkbox-card"><label><small>Shooting Stars</small></label><input type="checkbox" id="certs_stars" <%= settings.pageScopes.certifications.starsEnabled ? 'checked' : '' %>></div>
+            <div class="matrix-checkbox-card"><label><small>Click Fireworks</small></label><input type="checkbox" id="certs_fireworks" <%= settings.pageScopes.certifications.fireworksEnabled ? 'checked' : '' %>></div>
+        </div>
+        <div id="pane-about" class="page-scope-pane">
+            <div class="matrix-checkbox-card"><label><small>Mario Platform</small></label><input type="checkbox" id="about_mario" <%= settings.pageScopes.about.marioEnabled ? 'checked' : '' %>></div>
+            <div class="matrix-checkbox-card"><label><small>Ironman Fly</small></label><input type="checkbox" id="about_ironman" <%= settings.pageScopes.about.ironManEnabled ? 'checked' : '' %>></div>
+            <div class="matrix-checkbox-card"><label><small>Thor Strike</small></label><input type="checkbox" id="about_thor" <%= settings.pageScopes.about.thorEnabled ? 'checked' : '' %>></div>
+            <div class="matrix-checkbox-card"><label><small>Jet Flybys</small></label><input type="checkbox" id="about_jets" <%= settings.pageScopes.about.jetsEnabled ? 'checked' : '' %>></div>
+            <div class="matrix-checkbox-card"><label><small>Shooting Stars</small></label><input type="checkbox" id="about_stars" <%= settings.pageScopes.about.starsEnabled ? 'checked' : '' %>></div>
+            <div class="matrix-checkbox-card"><label><small>Click Fireworks</small></label><input type="checkbox" id="about_fireworks" <%= settings.pageScopes.about.fireworksEnabled ? 'checked' : '' %>></div>
+        </div>
+        <div id="pane-contact" class="page-scope-pane">
+            <div class="matrix-checkbox-card"><label><small>Mario Platform</small></label><input type="checkbox" id="contact_mario" <%= settings.pageScopes.contact.marioEnabled ? 'checked' : '' %>></div>
+            <div class="matrix-checkbox-card"><label><small>Ironman Fly</small></label><input type="checkbox" id="contact_ironman" <%= settings.pageScopes.contact.ironManEnabled ? 'checked' : '' %>></div>
+            <div class="matrix-checkbox-card"><label><small>Thor Strike</small></label><input type="checkbox" id="contact_thor" <%= settings.pageScopes.contact.thorEnabled ? 'checked' : '' %>></div>
+            <div class="matrix-checkbox-card"><label><small>Jet Flybys</small></label><input type="checkbox" id="contact_jets" <%= settings.pageScopes.contact.jetsEnabled ? 'checked' : '' %>></div>
+            <div class="matrix-checkbox-card"><label><small>Shooting Stars</small></label><input type="checkbox" id="contact_stars" <%= settings.pageScopes.contact.starsEnabled ? 'checked' : '' %>></div>
+            <div class="matrix-checkbox-card"><label><small>Click Fireworks</small></label><input type="checkbox" id="contact_fireworks" <%= settings.pageScopes.contact.fireworksEnabled ? 'checked' : '' %>></div>
+        </div>
+    </form>
+</section>

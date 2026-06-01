@@ -1,0 +1,29 @@
+<div id="projectSpaceWorkspaceBlock">
+    <section style="background: var(--bg-surface); padding: 25px; border-radius: 16px; border: 1px solid var(--glass-border);">
+        <div class="section-header"><h2><i class="fa-solid fa-layer-group"></i> Active Grid Layout Cards (<span id="activeCount"><%= projects.length %></span>)</h2></div>
+        <div class="manager-list" id="activeProjectsWrapper">
+            <% projects.forEach((project, idx) => { %>
+                <div class="manager-card active-node-row" id="card-<%= project._id %>" data-title="<%= project.title.toLowerCase() %>" data-category="<%= project.category %>" data-tags="<%= project.tags.join(',').toLowerCase() %>" data-json="<%= JSON.stringify(project) %>">
+                    <div style="display: flex; align-items: center;">
+                        <div class="ordering-docks">
+                            <button class="order-nav-btn" onclick="shiftGridComponentSequence('<%= project._id %>', 'UP')" title="Move up"><i class="fa-solid fa-chevron-up"></i></button>
+                            <button class="order-nav-btn" onclick="shiftGridComponentSequence('<%= project._id %>', 'DOWN')" title="Move down"><i class="fa-solid fa-chevron-down"></i></button>
+                        </div>
+                        <div class="card-details">
+                            <h3><%= project.title %></h3>
+                            <div class="card-meta">
+                                <span class="meta-tag"><%= project.category %></span><span>Size: <strong><%= project.layout?.size %></strong></span>
+                                <% if (project.accentColor) { %><span <%- `style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: ${project.accentColor}; box-shadow: 0 0 6px ${project.accentColor};"` %>></span><% } %>
+                                <% project.tags.forEach(t => { %><span class="tech-pill"><%= t %></span><% }) %>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn-action" onclick="initializeEditContext('<%= project._id %>')"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button class="btn-action btn-delete" onclick="softDeleteProjectNode('<%= project._id %>')"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+    </section>
+</div>

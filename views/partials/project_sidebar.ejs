@@ -1,0 +1,50 @@
+<div id="projectSidebarBlock">
+    <div class="panel-title">
+        <span id="formActionTitle">Add New Project</span>
+        <span class="cancel-edit-btn" id="cancelEditBtn" onclick="resetFormToCreateMode()"><i class="fa-solid fa-xmark"></i> Cancel</span>
+    </div>
+    <form id="projectForm">
+        <input type="hidden" id="projectId" name="projectId" value="">
+        <div class="form-group"><label for="title">Project Title</label><input type="text" id="title" name="title" class="form-control" placeholder="e.g., YogiAI Platform" required></div>
+        <div class="form-group">
+            <label for="category">Category Track</label>
+            <select id="category" name="category" class="form-control" required>
+                <option value="Personal Projects">Personal Projects</option>
+                <option value="College Projects">College Projects</option>
+                <option value="Udemy Projects">Udemy Projects</option>
+                <option value="Coursera Projects">Coursera Projects</option>
+            </select>
+        </div>
+        <div class="form-group"><label for="description">Milestone Context</label><textarea id="description" name="description" class="form-control" rows="3" placeholder="Describe engineering milestones..." required></textarea></div>
+        <div class="form-group"><label for="tags">Technology Stack Arrays</label><input type="text" id="tags" name="tags" class="form-control" placeholder="Separated by commas, e.g., PyTorch, RAG, LLM"></div>
+        <div class="form-group"><label for="github">GitHub Link</label><input type="url" id="github" name="github" class="form-control" placeholder="https://github.com/..."></div>
+        <div class="form-group"><label for="liveUrl">Production URL</label><input type="url" id="liveUrl" name="liveUrl" class="form-control" placeholder="https://..."></div>
+        <div class="form-group"><label for="datasetUrl">Dataset Drive Access URI</label><input type="url" id="datasetUrl" name="datasetUrl" class="form-control" placeholder="https://drive.google.com/..."></div>
+        <div class="form-group">
+            <label for="size">Visual Layout Aspect Ratio Sizing</label>
+            <select id="size" name="size" class="form-control">
+                <option value="normal">Normal Grid (1x1 block)</option>
+                <option value="wide-block">Wide Block (2x1 Column Span)</option>
+                <option value="tall-block">Tall Block (1x2 Row Span)</option>
+                <option value="large-block">Large Hero Quadrant (2x2 Grid Span)</option>
+            </select>
+        </div>
+        <div class="form-group" style="display: grid; grid-template-columns: 1fr 2fr; gap: 10px;">
+            <div><label for="accentColor">Brand Aura</label><input type="color" id="accentColor" name="accentColor" class="form-control" value="#00f2ea" style="padding:4px; height:38px; cursor:pointer;"></div>
+            <div>
+                <label for="hoverAnimation">Hover Engine</label>
+                <select id="hoverAnimation" name="hoverAnimation" class="form-control">
+                    <option value="aura-glow">Aura Ambient Glow</option>
+                    <option value="cyber-pulse">Cyberpunk Pulse</option>
+                    <option value="glitch-drift">Glitch Displacement</option>
+                </select>
+            </div>
+        </div>
+        <button type="submit" class="btn-submit" id="submitProjectBtn">Publish Component Node</button>
+    </form>
+    <span class="batch-toggle" onclick="toggleBatchViewDisplay('PROJECT')">⚙️ Open Bulk Import Matrix</span>
+    <div class="batch-area" id="projectBatchWrapper">
+        <div class="form-group"><label>Paste Raw JSON Entry Array</label><textarea id="projectBatchInput" class="form-control" rows="4" style="font-family: var(--font-mono); font-size: 0.8rem;" placeholder='[{"title": "Bulk Node", "category": "Personal Projects"}]'></textarea></div>
+        <button class="btn-submit" onclick="executeBatchDataIngestion('PROJECT')" style="padding: 6px; font-size: 0.8rem; margin: 0;">Execute Bulk Stream</button>
+    </div>
+</div>

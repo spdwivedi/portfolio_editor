@@ -2,26 +2,44 @@
  * FILE DETAILS: Advanced Studio Editor Routing Engine & Data Management System
  * -------------------------------------------------------------------------
  * This file orchestrates all data transformations across your cloud cluster.
- * Upgraded with nested transaction engines to support per-page visual matrix controls,
- * custom duration scales, and custom timing arrays:
- * 1. GET Dashboard Core ('/'): Pulls production lists, recycled buckets, credentials,
- * logs, and initializes/normalizes the nested settings telemetry state.
- * 2. POST High-Density Settings ('/settings'): Parses highly granular forms, translating
- * independent checkbox strings and speed inputs into structured database scopes.
+ * Upgraded with session security barriers and multi-database routing layers.
+ * * 1. GATEKEEPER MIDDLEWARE: Validates administrative session tokens prior to resolving endpoints.
+ * 2. DATABASE CROSS-ROUTING: Utilizes useDb() to target the live portfolio data space seamlessly.
  */
 
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 
-// Synchronize application definitions with the underlying MongoDB collection maps
-const Project = require('../models/Project');
-const Certificate = require('../models/Certificate');
-const ActivityLog = require('../models/ActivityLog');
-const Setting = require('../models/Setting');
+// ==========================================
+// 1. SESSION AUTHENTICATION GUARD (MIDDLEWARE)
+// ==========================================
+const isAuthenticated = (req, res, next) => {
+    // If the session exists and a valid user object is attached, let them through
+    if (req.session && req.session.user) {
+        return next();
+    }
+    // Otherwise, block the request and send them back to the login gateway
+    res.redirect('/auth/login');
+};
+
+// Apply the security guard to ALL routes within this engine file
+router.use(isAuthenticated);
 
 // ==========================================
-// 1. DASHBOARD FRAMEWORK DISPATCHER
+// 2. MULTI-DATABASE CROSS-ROUTING SCHEME
+// ==========================================
+// Explicitly shift the database context pointer to target your portfolio data grid
+const portfolioDb = mongoose.connection.useDb('portfolio_db');
+
+// Extract the schemas from your models and compile them against the live portfolio database context
+const Project = portfolioDb.model('Project', require('../models/Project').schema);
+const Certificate = portfolioDb.model('Certificate', require('../models/Certificate').schema);
+const ActivityLog = portfolioDb.model('ActivityLog', require('../models/ActivityLog').schema);
+const Setting = portfolioDb.model('Setting', require('../models/Setting').schema);
+
+// ==========================================
+// 3. DASHBOARD FRAMEWORK DISPATCHER
 // ==========================================
 router.get('/', async (req, res) => {
     try {
@@ -52,7 +70,7 @@ router.get('/', async (req, res) => {
 });
 
 // ==========================================
-// 2. LIVE GLOBAL & PER-PAGE SETTINGS CONTROL PIPELINE
+// 4. LIVE GLOBAL & PER-PAGE SETTINGS CONTROL PIPELINE
 // ==========================================
 router.post('/settings', async (req, res) => {
     try {
@@ -70,7 +88,7 @@ router.post('/settings', async (req, res) => {
             fireworksClickProbability,
             ironManFlightDuration,
             thorStrikeDuration,
-            jetFlightDuration, // PARSED: New sci-fi stealth jet visibility duration tracker
+            jetFlightDuration,
             shootingStarDuration,
             
             // Per-Page Scopes Mapping Ingestion Elements
@@ -100,7 +118,7 @@ router.post('/settings', async (req, res) => {
             // Flight & Physics Durations
             ironManFlightDuration: parseFloat(ironManFlightDuration) || 2.6,
             thorStrikeDuration: parseFloat(thorStrikeDuration) || 1.5,
-            jetFlightDuration: parseFloat(jetFlightDuration) || 4.2, // SYNCHRONIZED: Transmitted smoothly to cloud databases
+            jetFlightDuration: parseFloat(jetFlightDuration) || 4.2,
             shootingStarDuration: parseFloat(shootingStarDuration) || 1.2,
 
             // Build Per-Page Structured Deep Context Maps
@@ -161,7 +179,7 @@ router.post('/settings', async (req, res) => {
             targetType: 'Project',
             targetId: currentSettings._id,
             description: `GLOBAL GRAPH INTERFACE TUNING: Updated execution tracks, minute loops, and multi-page visibility matrices.`,
-            operator: req.body.operator || 'Admin'
+            operator: req.session.user.email // Automatically tracks the logged-in administrator's email
         });
         await configurationLog.save();
 
@@ -173,13 +191,13 @@ router.post('/settings', async (req, res) => {
 });
 
 // ==========================================
-// 3. SMART BATCH DATA INGESTION ENGINE
+// 5. SMART BATCH DATA INGESTION ENGINE
 // ==========================================
 router.post('/:spaceType/batch', async (req, res) => {
     try {
         const { spaceType } = req.params;
-        const { items, strategy, operator } = req.body; 
-        const currentOperator = operator || 'Admin';
+        const { items, strategy } = req.body; 
+        const currentOperator = req.session.user.email;
 
         if (!items || !Array.isArray(items)) {
             return res.status(400).json({ success: false, error: 'Pasted payload must be a valid JSON array structure.' });
@@ -259,7 +277,7 @@ router.post('/:spaceType/batch', async (req, res) => {
                 processedCount++;
             }
         } else {
-            return res.status(400).json({ success: false, error: 'Unknown workspace data space context parameter.' });
+            return res.status(400).doc({ success: false, error: 'Unknown workspace data space context parameter.' });
         }
 
         const batchAuditRecord = new ActivityLog({
@@ -279,7 +297,7 @@ router.post('/:spaceType/batch', async (req, res) => {
 });
 
 // ==========================================
-// 4. SECURE SYSTEM DATA EXPORT BACKUP MODULES
+// 6. SECURE SYSTEM DATA EXPORT BACKUP MODULES
 // ==========================================
 router.get('/:spaceType/export', async (req, res) => {
     try {
@@ -306,7 +324,7 @@ router.get('/:spaceType/export', async (req, res) => {
 });
 
 // ==========================================
-// 5. PROJECT SINGLE INSTANCE CREATION CORE
+// 7. PROJECT SINGLE INSTANCE CREATION CORE
 // ==========================================
 router.post('/projects', async (req, res) => {
     try {
@@ -332,7 +350,7 @@ router.post('/projects', async (req, res) => {
             targetType: 'Project',
             targetId: savedProject._id,
             description: `Successfully published new project node: "${title}" into the ${category} track.`,
-            operator: req.body.operator || 'Admin'
+            operator: req.session.user.email
         });
         await auditRecord.save();
 
@@ -343,7 +361,7 @@ router.post('/projects', async (req, res) => {
 });
 
 // ==========================================
-// 6. COMPONENT MODIFICATION CORE (UPDATE)
+// 8. COMPONENT MODIFICATION CORE (UPDATE)
 // ==========================================
 router.put('/projects/:id', async (req, res) => {
     try {
@@ -368,7 +386,7 @@ router.put('/projects/:id', async (req, res) => {
             targetType: 'Project',
             targetId: resultNode._id,
             description: `Modified project configuration and field mappings for "${title}".`,
-            operator: req.body.operator || 'Admin'
+            operator: req.session.user.email
         });
         await changeLog.save();
 
@@ -379,7 +397,7 @@ router.put('/projects/:id', async (req, res) => {
 });
 
 // ==========================================
-// 7. RECYCLE BIN PIPELINE MECHANICS (SOFT-DELETE)
+// 9. RECYCLE BIN PIPELINE MECHANICS (SOFT-DELETE)
 // ==========================================
 router.patch('/projects/:id/delete', async (req, res) => {
     try {
@@ -391,7 +409,7 @@ router.patch('/projects/:id/delete', async (req, res) => {
             targetType: 'Project',
             targetId: softDeletedNode._id,
             description: `Soft-deleted project "${softDeletedNode.title}" and relocated it to the Recycle Bin container.`,
-            operator: req.query.operator || 'Admin'
+            operator: req.session.user.email
         });
         await deleteLog.save();
 
@@ -402,7 +420,7 @@ router.patch('/projects/:id/delete', async (req, res) => {
 });
 
 // ==========================================
-// 8. RESTORATION ENGINE MECHANICAL PIPELINE (UNDO SOFT-DELETE)
+// 10. RESTORATION ENGINE MECHANICAL PIPELINE (UNDO SOFT-DELETE)
 // ==========================================
 router.patch('/projects/:id/restore', async (req, res) => {
     try {
@@ -414,7 +432,7 @@ router.patch('/projects/:id/restore', async (req, res) => {
             targetType: 'Project',
             targetId: restoredNode._id,
             description: `Recovered and restored project "${restoredNode.title}" back to the active production grid matrix.`,
-            operator: req.query.operator || 'Admin'
+            operator: req.session.user.email
         });
         await restoreLog.save();
 
@@ -425,7 +443,7 @@ router.patch('/projects/:id/restore', async (req, res) => {
 });
 
 // ==========================================
-// 9. HARD PURGE DATA MECHANICS (PERMANENT TERMINAL WIPE)
+// 11. HARD PURGE DATA MECHANICS (PERMANENT TERMINAL WIPE)
 // ==========================================
 router.delete('/projects/:id/permanent', async (req, res) => {
     try {
@@ -439,7 +457,7 @@ router.delete('/projects/:id/permanent', async (req, res) => {
             targetType: 'Project',
             targetId: req.params.id,
             description: `PERMANENT WIPE: Erased node "${targetNode.title}" completely from database cluster storage.`,
-            operator: req.query.operator || 'Admin'
+            operator: req.session.user.email
         });
         await hardPurgeLog.save();
 
@@ -450,7 +468,7 @@ router.delete('/projects/:id/permanent', async (req, res) => {
 });
 
 // ==========================================
-// 10. ASYMMETRIC SORT ALIGNMENT TRACKER (REORDER)
+// 12. ASYMMETRIC SORT ALIGNMENT TRACKER (REORDER)
 // ==========================================
 router.post('/projects/reorder', async (req, res) => {
     try {
@@ -468,7 +486,7 @@ router.post('/projects/reorder', async (req, res) => {
 });
 
 // ==========================================
-// 11. CERTIFICATE INGESTION MODULE (CREATE)
+// 13. CERTIFICATE INGESTION MODULE (CREATE)
 // ==========================================
 router.post('/certificates', async (req, res) => {
     try {
@@ -488,7 +506,7 @@ router.post('/certificates', async (req, res) => {
             targetType: 'Certificate',
             targetId: savedCert._id,
             description: `Added certification milestone: "${title}" accomplished on platform ${platform}.`,
-            operator: req.body.operator || 'Admin'
+            operator: req.session.user.email
         });
         await auditRecord.save();
 
@@ -499,7 +517,7 @@ router.post('/certificates', async (req, res) => {
 });
 
 // ==========================================
-// 12. CERTIFICATE MODIFICATION MODULE (UPDATE)
+// 14. CERTIFICATE MODIFICATION MODULE (UPDATE)
 // ==========================================
 router.put('/certificates/:id', async (req, res) => {
     try {
@@ -520,7 +538,7 @@ router.put('/certificates/:id', async (req, res) => {
             targetType: 'Certificate',
             targetId: resultNode._id,
             description: `Recalibrated credential parameters and validation links for "${title}".`,
-            operator: req.body.operator || 'Admin'
+            operator: req.session.user.email
         });
         await changeLog.save();
 
@@ -531,7 +549,7 @@ router.put('/certificates/:id', async (req, res) => {
 });
 
 // ==========================================
-// 13. CERTIFICATE TERMINAL PURGE MODULE (DELETE)
+// 15. CERTIFICATE TERMINAL PURGE MODULE (DELETE)
 // ==========================================
 router.delete('/certificates/:id', async (req, res) => {
     try {
@@ -545,7 +563,7 @@ router.delete('/certificates/:id', async (req, res) => {
             targetType: 'Certificate',
             targetId: req.params.id,
             description: `Permanently deleted certification credential file: "${targetNode.title}" from index registries.`,
-            operator: req.query.operator || 'Admin'
+            operator: req.session.user.email
         });
         await purgeLog.save();
 

@@ -1,0 +1,19 @@
+<header>
+    <h1>Dwivedi.AI <span>Studio Cockpit</span></h1>
+    
+    <div class="workspace-switcher">
+        <button class="mode-btn active" id="globalProjectModeBtn" onclick="toggleGlobalStudioContext('PROJECT')">Projects Space</button>
+        <button class="mode-btn" id="globalCertModeBtn" onclick="toggleGlobalStudioContext('CERT')">Credentials Space</button>
+        <button class="mode-btn" id="globalUserModeBtn" onclick="toggleGlobalStudioContext('USER')">Security Space</button>
+    </div>
+
+    <div class="header-controls">
+        <button class="passkey-register-btn" onclick="registerNewPasskeyDevice()" title="Bind Security Key Hardware Token"><i class="fa-solid fa-key"></i> Link Passkey</button>
+        <a href="/auth/logout" class="logout-btn" title="Destroy Session State Gate"><i class="fa-solid fa-power-off"></i> Exit</a>
+        
+        <button class="theme-toggle-btn" id="themeToggle" title="Toggle Dashboard Theme"><i class="fa-solid fa-moon"></i></button>
+        <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted); background: var(--bg-surface); padding: 8px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.04);">
+            Cluster Stable <i class="fa-solid fa-circle" style="color: var(--accent-success); font-size: 0.5rem; margin-left: 4px;"></i>
+        </div>
+    </div>
+</header>

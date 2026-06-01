@@ -1,0 +1,104 @@
+<div id="userSpaceWorkspaceBlock" class="hidden-space-node">
+    <section style="background: var(--bg-surface); padding: 25px; border-radius: 16px; border: 1px solid var(--accent-success);">
+        <div class="section-header">
+            <h2 style="color: var(--accent-success);"><i class="fa-solid fa-shield-halved"></i> Access Enclave Registries</h2>
+            <button class="btn-submit" style="margin: 0; width: auto; padding: 6px 20px; font-size: 0.8rem; border-color: var(--accent-success); color: var(--accent-success);" onclick="refreshUserRegistryGrid()">Sync Security Registry</button>
+        </div>
+
+        <div class="manager-list" id="securityUserRegistryWrapper" style="margin-top: 20px;">
+            <p style="color: var(--text-muted); font-style: italic; text-align: center; padding: 20px 0;">Synchronizing access telemetry streams...</p>
+        </div>
+    </section>
+</div>
+
+<script>
+    // Asynchronously pull and compile profile records from internal management APIs
+    async function refreshUserRegistryGrid() {
+        const wrapper = document.getElementById('securityUserRegistryWrapper');
+        try {
+            const response = await fetch('/auth/users');
+            if (!response.ok) throw new Error('Authorization telemetry lookup failure.');
+            const users = await response.json();
+
+            if (users.length === 0) {
+                wrapper.innerHTML = `<p style="color: var(--text-muted); font-style: italic; text-align: center; padding: 20px 0;">No active user profiles registered in this cluster block.</p>`;
+                return;
+            }
+
+            wrapper.innerHTML = users.map(profile => {
+                // Compile Passkey token sub-grids nested inside user records
+                const passkeyTokensGrid = profile.passkeys.length === 0 
+                    ? `<p style="color: var(--text-muted); font-size: 0.8rem; font-style: italic; margin-top: 8px;">No biometric authentication hardware linked to this profile node.</p>`
+                    : profile.passkeys.map(key => `
+                        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.01); border: 1px dashed rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 6px; margin-top: 8px;">
+                            <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-main);">
+                                <i class="fa-solid fa-microchip" style="color: var(--accent-primary); margin-right: 4px;"></i> Token ID: <span style="color: var(--accent-primary);">${key.credentialID.substring(0, 12)}...</span>
+                                <span style="margin-left: 15px; color: var(--text-muted);">Signature Counter: <strong style="color: var(--accent-warning);">${key.counter}</strong></span>
+                            </div>
+                            <button class="btn-action btn-delete" style="width: 26px; height: 26px; font-size: 0.75rem;" onclick="revokeHardwareToken('${profile._id}', '${key.credentialID}')" title="Revoke Hardware Key Signature Token"><i class="fa-solid fa-key-skeleton"></i></button>
+                        </div>
+                    `).join('');
+
+                return `
+                    <div class="manager-card" style="flex-direction: column; align-items: stretch; gap: 15px; border-left: 3px solid var(--accent-success);">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h3 style="font-size: 1.15rem; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
+                                    <i class="fa-solid fa-user-gear" style="color: var(--accent-success); font-size: 1rem;"></i> ${profile.email}
+                                </h3>
+                                <div class="card-meta" style="margin-top: 4px;">
+                                    <span>Profile UUID: <strong style="color: var(--text-main); font-family: var(--font-mono); font-size: 0.75rem;">${profile._id}</strong></span>
+                                    <span>Initialized: <strong style="color: var(--text-main);">${new Date(profile.createdAt).toLocaleDateString('en-IN')}</strong></span>
+                                </div>
+                            </div>
+                            <button class="btn-action btn-delete" onclick="terminateAdministratorProfile('${profile._id}', '${profile.email}')" title="Purge Administrator Profile Document"><i class="fa-solid fa-user-minus"></i></button>
+                        </div>
+                        <div style="background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.02);">
+                            <h4 style="font-size: 0.8rem; font-family: var(--font-mono); text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.5px;">Linked FIDO2 Keys Matrix</h4>
+                            ${passkeyTokensGrid}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+        } catch (err) {
+            wrapper.innerHTML = `<p style="color: var(--accent-secondary); font-style: italic; text-align: center; padding: 20px 0;"><i class="fa-solid fa-triangle-exclamation"></i> Telemetry Sync Interrupted: ${err.message}</p>`;
+        }
+    }
+
+    // Deconstruct and remove an administrator account document map completely
+    async function terminateAdministratorProfile(id, email) {
+        if (!confirm(`🚨 CRITICAL ACTION: Are you absolutely certain you want to permanently erase the administrator account "${email}" from the security registry?`)) return;
+
+        try {
+            const res = await fetch(`/auth/users/${id}`, { method: 'DELETE' });
+            const data = await res.json();
+            if (data.success) {
+                alert('Profile document extracted successfully from system registries.');
+                refreshUserRegistryGrid();
+            } else {
+                alert(`Purge execution blocked: ${data.error}`);
+            }
+        } catch (err) {
+            alert(`Error handling transaction loop: ${err.message}`);
+        }
+    }
+
+    // Disconnect and revoke a hardware encryption key configuration signature
+    async function revokeHardwareToken(userId, credentialId) {
+        if (!confirm('Are you certain you want to revoke this physical hardware key token mapping? The associated device will lose passwordless access gates immediately.')) return;
+
+        try {
+            const res = await fetch(`/auth/users/${userId}/passkeys/${credentialId}`, { method: 'DELETE' });
+            const data = await res.json();
+            if (data.success) {
+                alert('Hardware signature key cleanly dropped out of the authorization block.');
+                refreshUserRegistryGrid();
+            } else {
+                alert(`Revocation processing rejected: ${data.error}`);
+            }
+        } catch (err) {
+            alert(`Error updating enclave matrices: ${err.message}`);
+        }
+    }
+</script>
